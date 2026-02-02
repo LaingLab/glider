@@ -1,0 +1,100 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "GLIDER"
+version = "1.0.0"
+description = "General Laboratory Interface for Design, Experimentation, and Recording"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+authors = [
+    {name = "LaingLab"}
+]
+keywords = ["laboratory", "automation", "hardware", "orchestration", "experiment"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+]
+
+dependencies = [
+    "qasync>=0.24.0",
+    "telemetrix-aio>=1.0.0",
+    "pyserial>=3.5",
+    "jsonschema>=4.0.0",
+    "pyqtgraph>=0.13.0",
+    "numpy>=1.21.0",
+    "opencv-python>=4.8.0",
+    "scipy>=1.10.0",
+    "httpx>=0.24.0",
+    "adafruit-circuitpython-ads1x15",
+    "ryvencore>=0.4.0",
+    "ultralytics>=8.0.0",
+    "pandas>=2.0.0",
+]
+
+[project.optional-dependencies]
+rpi = [
+    "gpiozero>=2.0",
+    "lgpio>=0.2.0",
+]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-qt>=4.2.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "PyQt6>=6.4.0"
+]
+pc = [
+    "PyQt6>=6.4.0",
+]
+
+[project.scripts]
+glider = "glider.__main__:main"
+
+[project.entry-points."glider.driver"]
+# Built-in drivers are registered here
+arduino = "glider.hal.boards.telemetrix_board:TelemetrixBoard"
+raspberry_pi = "glider.hal.boards.pi_gpio_board:PiGPIOBoard"
+
+[project.urls]
+Homepage = "https://github.com/LaingLab/glider"
+Documentation = "https://github.com/LaingLab/glider#readme"
+Repository = "https://github.com/LaingLab/glider"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+glider = ["schema/*.json", "gui/styles/*.qss"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "C4"]
+ignore = [
+    "E501",  # line too long (handled by formatter)
+    "N802",  # function name should be lowercase (Qt method overrides use camelCase)
+    "N812",  # lowercase imported as non-lowercase (intentional for hardware libraries)
+    "B027",  # empty method in ABC without abstract decorator (intentional for optional overrides)
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Hardware abstraction files use imports for availability checking
+"src/glider/hal/boards/*.py" = ["F401"]
+"src/glider/hal/base_device.py" = ["F401"]
